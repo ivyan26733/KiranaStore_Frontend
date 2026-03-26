@@ -1,36 +1,70 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# DukaaanOS - Client (Frontend)
+
+DukaaanOS is a modern, mobile-first web application designed for Kirana store owners to manage their inventory, billing, and shop profiles efficiently.
+
+## Tech Stack
+
+- **Framework**: [Next.js 16 (App Router)](https://nextjs.org/)
+- **UI Library**: [React 19](https://react.dev/)
+- **Styling**: [Tailwind CSS v4](https://tailwindcss.com/)
+- **State Management**: [Zustand](https://github.com/pmndrs/zustand)
+- **Animations**: [Framer Motion](https://www.framer.com/motion/)
+- **HTTP Client**: [Axios](https://axios-http.com/)
+- **Notifications**: [React Hot Toast](https://react-hot-toast.com/)
+- **Barcode Scanning**: [React Zxing](https://github.com/Sec-ant/react-zxing)
+- **Authentication**: Firebase Auth
+
+## Features
+
+- **Dashboard**: View daily revenue, recent bills, and low stock alerts.
+- **Products**: Browse inventory with category filters and search.
+- **Add Product**: Interactive, step-by-step form to add new products, with barcode scanning support.
+- **Billing**: Create new bills, manage cart, apply discounts, and select payment modes (Cash, UPI, Udhaari).
+- **History**: View past transactions with expandable bill details.
+- **Profile**: View shopkeeper and shop details, and log out.
 
 ## Getting Started
 
-First, run the development server:
+### Prerequisites
+
+- Node.js (v18 or higher recommended)
+- npm or yarn
+
+### Installation
+
+1. Navigate to the client directory:
+   ```bash
+   cd client
+   ```
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
+
+### Environment Variables
+
+Ensure you have a `.env.local` file in the root of the `client` directory (if required) to set configurations such as `NEXT_PUBLIC_API_URL` or Firebase credentials.
+
+### Running the Development Server
+
+To start the development server, run:
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+This will run the Next.js app on `http://0.0.0.0:3000` (listening on all network interfaces for local mobile testing).
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+### Building for Production
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+To create an optimized production build:
 
-## Learn More
+```bash
+npm run build
+```
 
-To learn more about Next.js, take a look at the following resources:
+To start the production server:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```bash
+npm run start
+```

@@ -1,26 +1,68 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+@theme {
+  --color-cream: #fffbf5;
+  --color-saffron-50: #fff8f0;
+  --color-saffron-100: #feecd8;
+  --color-saffron-200: #fcd5a8;
+  --color-saffron-500: #f97316;
+  --color-saffron-600: #ea6010;
+  --font-sans: 'Inter', system-ui, sans-serif;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+* {
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
+html { font-family: var(--font-sans); }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: #fffbf5;
+  color: #1c0a00;
+  overscroll-behavior: none;
+}
+
+.page-container {
+  max-width: 480px;
+  margin: 0 auto;
+  padding: 0 16px;
+  padding-bottom: 96px;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar { width: 3px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #fcd5a8; border-radius: 4px; }
+
+/* Remove default focus outline — we handle it manually */
+input:focus, select:focus, textarea:focus { outline: none; }
+
+/* Line clamp utility */
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Skeleton shimmer */
+@keyframes shimmer {
+  0% { background-position: -400px 0; }
+  100% { background-position: 400px 0; }
+}
+.skeleton {
+  background: linear-gradient(90deg, #fde8cc 25%, #fff5e6 50%, #fde8cc 75%);
+  background-size: 800px 100%;
+  animation: shimmer 1.4s ease-in-out infinite;
+  border-radius: 12px;
+}
+
+/* Typing cursor blink */
+@keyframes blink { 0%, 100% { opacity: 1 } 50% { opacity: 0 } }
+.cursor-blink::after {
+  content: '|';
+  animation: blink 1s step-end infinite;
+  color: #f97316;
+  margin-left: 1px;
 }
