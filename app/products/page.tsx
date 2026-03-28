@@ -7,8 +7,8 @@ import toast from 'react-hot-toast'
 import AppHeader from '@/components/AppHeader'
 import ProductCard from '@/components/ProductCard'
 import EmptyState from '@/components/EmptyState'
-import { getProducts, deleteProduct } from '@/lib/api'
-import { useCartStore } from '@/lib/store'
+import { getProducts } from '@/lib/api'
+import { useCartStore, type Product } from '@/lib/store'
 
 const CATEGORIES = ['All', 'Dairy', 'Atta/Grains', 'Oil/Ghee', 'Masale', 'Snacks', 'Drinks', 'Household', 'Personal Care', 'Other']
 
@@ -27,7 +27,7 @@ function SkeletonCard() {
 }
 
 export default function ProductsPage() {
-  const [products, setProducts] = useState([])
+  const [products, setProducts] = useState<Product[]>([])
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
   const [category, setCategory] = useState('All')
@@ -47,7 +47,7 @@ export default function ProductsPage() {
     }
   }
 
-  const filtered = useMemo(() => products.filter((p) => {
+  const filtered = useMemo(() => products.filter((p: Product) => {
     const s = search.toLowerCase()
     return (
       (!s || p.name.toLowerCase().includes(s) || (p.barcode || '').includes(s)) &&
@@ -55,7 +55,7 @@ export default function ProductsPage() {
     )
   }), [products, search, category])
 
-  function handleAddToCart(product) {
+  function handleAddToCart(product: Product) {
     addItem(product)
     toast.success(`${product.name} cart में जोड़ा`, { icon: '🛒', duration: 1500 })
   }

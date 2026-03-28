@@ -2,8 +2,17 @@
 
 import { motion } from 'framer-motion'
 
-export default function SummaryCard({ label, labelHi, value, icon, color = 'orange', delay = 0 }) {
-  const colorMap = {
+interface SummaryCardProps {
+  label: string
+  labelHi: string
+  value: string | number
+  icon: string
+  color?: 'orange' | 'green' | 'yellow' | 'blue'
+  delay?: number
+}
+
+export default function SummaryCard({ label, labelHi, value, icon, color = 'orange', delay = 0 }: SummaryCardProps) {
+  const colorMap: Record<string, string> = {
     orange: 'bg-orange-50 border-orange-100 text-orange-600',
     green:  'bg-green-50  border-green-100  text-green-600',
     yellow: 'bg-yellow-50 border-yellow-100 text-yellow-600',

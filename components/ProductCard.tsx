@@ -1,8 +1,15 @@
 'use client'
 
 import { motion } from 'framer-motion'
+import type { Product } from '@/lib/store'
 
-export default function ProductCard({ product, onAdd, showStock = false }) {
+interface ProductCardProps {
+  product: Product
+  onAdd?: (product: Product) => void
+  showStock?: boolean
+}
+
+export default function ProductCard({ product, onAdd, showStock = false }: ProductCardProps) {
   const isLowStock = product.current_stock <= product.low_stock_alert
   const isOutOfStock = product.current_stock === 0
 

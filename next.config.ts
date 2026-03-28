@@ -1,5 +1,6 @@
-/** @type {import('next').NextConfig} */
-const nextConfig = {
+import type { NextConfig } from 'next'
+
+const nextConfig: NextConfig = {
   allowedDevOrigins: ['192.168.1.8'],
   // Proxy all /api/* requests to the Express backend.
   // This runs server-side, so BACKEND_URL is never exposed to the browser.

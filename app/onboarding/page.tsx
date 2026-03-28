@@ -8,6 +8,7 @@ import Input from '@/components/Input'
 import Button from '@/components/Button'
 import { useAuthStore } from '@/lib/store'
 import { registerShop } from '@/lib/api'
+import type { AxiosError } from 'axios'
 
 const STEPS = ['basic', 'shop', 'done']
 
@@ -25,7 +26,7 @@ export default function OnboardingPage() {
     language: 'hi',
   })
 
-  function update(field, value) {
+  function update(field: string, value: string) {
     setForm((f) => ({ ...f, [field]: value }))
   }
 
@@ -39,8 +40,9 @@ export default function OnboardingPage() {
       const res = await registerShop(form)
       setAuth(res.data.shopkeeper, res.data.shop)
       setStep(2) // done screen
-    } catch (err) {
-      const msg = err.response?.data?.error || 'Registration failed'
+    } catch (err: unknown) {
+      const axErr = err as AxiosError<{ error?: string }>
+      const msg = axErr.response?.data?.error || 'Registration failed'
       toast.error(msg)
     } finally {
       setLoading(false)

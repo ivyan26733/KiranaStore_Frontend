@@ -1,17 +1,17 @@
 'use client'
 
+import { ReactNode } from 'react'
 import { useRouter } from 'next/navigation'
 import { motion } from 'framer-motion'
 
-/**
- * Reusable sticky app header.
- * Props:
- *   title      – main heading (English)
- *   titleHi    – Hindi subtitle (optional)
- *   back       – show back chevron  (boolean)
- *   right      – right slot (ReactNode)
- */
-export default function AppHeader({ title, titleHi, back = false, right }) {
+interface AppHeaderProps {
+  title: string
+  titleHi?: string
+  back?: boolean
+  right?: ReactNode
+}
+
+export default function AppHeader({ title, titleHi, back = false, right }: AppHeaderProps) {
   const router = useRouter()
 
   return (

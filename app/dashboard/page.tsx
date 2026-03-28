@@ -5,14 +5,22 @@ import { motion, AnimatePresence } from 'framer-motion'
 import Link from 'next/link'
 import toast from 'react-hot-toast'
 import { getDailySummary, getProducts } from '@/lib/api'
-import { useAuthStore } from '@/lib/store'
+import { useAuthStore, Product } from '@/lib/store'
 
-function AnimatedAmount({ value }) {
+interface DailySummary {
+  total_revenue: number | string
+  total_bills: number
+  cash_total: number | string
+  upi_total: number | string
+  udhaari_total: number | string
+}
+
+function AnimatedAmount({ value }: { value: number }) {
   const [display, setDisplay] = useState(0)
   useEffect(() => {
-    const target = parseFloat(value) || 0
+    const target = value || 0
     if (!target) return
-    let frame
+    let frame: number | null = null
     let current = 0
     const step = target / 30
     const tick = () => {
@@ -21,16 +29,16 @@ function AnimatedAmount({ value }) {
       if (current < target) frame = requestAnimationFrame(tick)
     }
     frame = requestAnimationFrame(tick)
-    return () => cancelAnimationFrame(frame)
+    return () => { if (frame !== null) cancelAnimationFrame(frame) }
   }, [value])
   return <span>₹{display.toLocaleString('en-IN')}</span>
 }
 
 const ACTIONS = [
-  { href: '/billing',         icon: '🧾', label: 'नया बिल',      sub: 'New Bill',     accent: 'orange' },
-  { href: '/products/new',    icon: '➕', label: 'Product जोड़ें', sub: 'Add Product',  accent: 'green'  },
-  { href: '/products',        icon: '📦', label: 'Stock',         sub: 'Inventory',    accent: 'blue'   },
-  { href: '/billing/history', icon: '📊', label: 'रिपोर्ट',       sub: 'Sales Report', accent: 'purple' },
+  { href: '/billing',         icon: '🧾', label: 'नया बिल',      sub: 'New Bill',     accent: 'orange' as const },
+  { href: '/products/new',    icon: '➕', label: 'Product जोड़ें', sub: 'Add Product',  accent: 'green'  as const },
+  { href: '/products',        icon: '📦', label: 'Stock',         sub: 'Inventory',    accent: 'blue'   as const },
+  { href: '/billing/history', icon: '📊', label: 'रिपोर्ट',       sub: 'Sales Report', accent: 'purple' as const },
 ]
 
 const ACCENT = {
@@ -42,8 +50,8 @@ const ACCENT = {
 
 export default function DashboardPage() {
   const { shopkeeper, shop } = useAuthStore()
-  const [summary, setSummary] = useState(null)
-  const [lowStock, setLowStock] = useState([])
+  const [summary, setSummary] = useState<DailySummary | null>(null)
+  const [lowStock, setLowStock] = useState<Product[]>([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
@@ -51,7 +59,7 @@ export default function DashboardPage() {
       .then(([s, p]) => {
         setSummary(s.data.summary)
         setLowStock((p.data.products || []).filter(
-          (x) => x.current_stock <= x.low_stock_alert && x.current_stock > 0
+          (x: Product) => x.current_stock <= x.low_stock_alert && x.current_stock > 0
         ).slice(0, 3))
       })
       .catch(() => toast.error('Data load नहीं हुआ'))
@@ -101,7 +109,7 @@ export default function DashboardPage() {
 
           <div className="relative">
             <p className="text-orange-100 text-xs font-semibold uppercase tracking-widest mb-1">
-              आज की कमाई · Today's Revenue
+              आज की कमाई · Today&apos;s Revenue
             </p>
             <div className="text-[38px] font-extrabold text-white leading-none tracking-tight mb-4">
               {loading

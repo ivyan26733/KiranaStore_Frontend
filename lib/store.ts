@@ -1,15 +1,61 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 
+// ─── Shared types ─────────────────────────────────────────────────────────────
+
+export interface Shopkeeper {
+  id: string
+  name: string
+  phone: string
+  language: string
+}
+
+export interface Shop {
+  id: string
+  name: string
+  address?: string | null
+  city?: string | null
+  qr_code?: string | null
+}
+
+export interface Product {
+  id: string
+  name: string
+  name_local?: string | null
+  barcode?: string | null
+  category?: string | null
+  unit: string
+  mrp: number | string
+  selling_price: number | string
+  current_stock: number
+  low_stock_alert: number
+  image_url?: string | null
+  is_active: boolean
+}
+
+export interface CartItem {
+  product: Product
+  quantity: number
+}
+
 // ─── Auth / Shop Store ────────────────────────────────────────────────────────
-export const useAuthStore = create(
+
+interface AuthState {
+  shopkeeper: Shopkeeper | null
+  shop: Shop | null
+  isRegistered: boolean
+  setAuth: (shopkeeper: Shopkeeper, shop: Shop) => void
+  clearAuth: () => void
+}
+
+export const useAuthStore = create<AuthState>()(
   persist(
     (set) => ({
       shopkeeper: null,
       shop: null,
       isRegistered: false,
 
-      setAuth: (shopkeeper, shop) =>
+      setAuth: (shopkeeper: Shopkeeper, shop: Shop) =>
         set({ shopkeeper, shop, isRegistered: true }),
 
       clearAuth: () =>
@@ -20,10 +66,21 @@ export const useAuthStore = create(
 )
 
 // ─── Cart Store (for billing page) ───────────────────────────────────────────
-export const useCartStore = create((set, get) => ({
-  items: [], // [{ product, quantity }]
 
-  addItem: (product) => {
+interface CartState {
+  items: CartItem[]
+  addItem: (product: Product) => void
+  removeItem: (productId: string) => void
+  updateQuantity: (productId: string, quantity: number) => void
+  clearCart: () => void
+  total: number
+  count: number
+}
+
+export const useCartStore = create<CartState>()((set, get) => ({
+  items: [],
+
+  addItem: (product: Product) => {
     const items = get().items
     const existing = items.find((i) => i.product.id === product.id)
 
@@ -40,10 +97,10 @@ export const useCartStore = create((set, get) => ({
     }
   },
 
-  removeItem: (productId) =>
+  removeItem: (productId: string) =>
     set({ items: get().items.filter((i) => i.product.id !== productId) }),
 
-  updateQuantity: (productId, quantity) => {
+  updateQuantity: (productId: string, quantity: number) => {
     if (quantity <= 0) {
       set({ items: get().items.filter((i) => i.product.id !== productId) })
     } else {

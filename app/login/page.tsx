@@ -16,7 +16,7 @@ export default function LoginPage() {
   const [phone, setPhone] = useState('')
   const [loading, setLoading] = useState(false)
 
-  async function handleDevLogin(e) {
+  async function handleDevLogin(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
     if (!phone || phone.length < 10) {
       toast.error('सही नंबर डालें (10 digits)')

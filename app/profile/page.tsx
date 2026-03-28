@@ -19,7 +19,10 @@ export default function ProfilePage() {
         .then(r => setAuth(r.data.shopkeeper, r.data.shop))
         .catch(() => {})
         .finally(() => setLoading(false))
+    } else {
+      setLoading(false)
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   function handleLogout() {

@@ -1,10 +1,18 @@
 'use client'
 
+import { ReactNode } from 'react'
 import { motion } from 'framer-motion'
 
-export default function Button({ children, variant = 'primary', loading = false, className = '', ...props }) {
+interface ButtonProps extends Omit<React.ComponentPropsWithoutRef<typeof motion.button>, 'children'> {
+  children: ReactNode
+  variant?: 'primary' | 'secondary' | 'danger' | 'ghost'
+  loading?: boolean
+  className?: string
+}
+
+export default function Button({ children, variant = 'primary', loading = false, className = '', ...props }: ButtonProps) {
   const base = 'w-full py-3.5 rounded-2xl font-bold text-sm transition flex items-center justify-center gap-2 disabled:opacity-50'
-  const variants = {
+  const variants: Record<string, string> = {
     primary:   'bg-orange-500 text-white shadow-lg shadow-orange-200 hover:bg-orange-600 active:bg-orange-700',
     secondary: 'bg-orange-50 text-orange-600 border border-orange-200 hover:bg-orange-100',
     danger:    'bg-red-50 text-red-600 border border-red-200 hover:bg-red-100',

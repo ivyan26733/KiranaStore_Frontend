@@ -22,21 +22,23 @@ api.interceptors.request.use((config) => {
 })
 
 // ─── Auth ────────────────────────────────────────────────────────────────────
-export const registerShop = (data) => api.post('/auth/register', data)
+export const registerShop = (data: Record<string, unknown>) => api.post('/auth/register', data)
 export const getMe = () => api.get('/auth/me')
 
 // ─── Products ────────────────────────────────────────────────────────────────
-export const getProducts = (params) => api.get('/products', { params })
-export const getProductByBarcode = (ean) => api.get(`/products/barcode/${ean}`)
-export const createProduct = (data) => api.post('/products', data)
-export const updateProduct = (id, data) => api.put(`/products/${id}`, data)
-export const deleteProduct = (id) => api.delete(`/products/${id}`)
-export const adjustStock = (id, data) => api.post(`/products/${id}/stock`, data)
+export const getProducts = (params?: Record<string, unknown>) => api.get('/products', { params })
+export const getProductByBarcode = (ean: string) => api.get(`/products/barcode/${ean}`)
+export const barcodeLookup = (ean: string) => api.get(`/products/barcode-lookup/${ean}`)
+export const createProduct = (data: Record<string, unknown>) => api.post('/products', data)
+export const updateProduct = (id: string, data: Record<string, unknown>) => api.put(`/products/${id}`, data)
+export const deleteProduct = (id: string) => api.delete(`/products/${id}`)
+export const adjustStock = (id: string, data: { delta: number; reason: string }) =>
+  api.post(`/products/${id}/stock`, data)
 
 // ─── Billing ─────────────────────────────────────────────────────────────────
-export const createBill = (data) => api.post('/bills', data)
-export const getBills = (params) => api.get('/bills', { params })
-export const getBill = (id) => api.get(`/bills/${id}`)
+export const createBill = (data: Record<string, unknown>) => api.post('/bills', data)
+export const getBills = (params?: Record<string, unknown>) => api.get('/bills', { params })
+export const getBill = (id: string) => api.get(`/bills/${id}`)
 export const getDailySummary = () => api.get('/bills/summary/daily')
 
 export default api

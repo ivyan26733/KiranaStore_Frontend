@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation'
 import dynamic from 'next/dynamic'
 import toast from 'react-hot-toast'
 import { createProduct, getProductByBarcode } from '@/lib/api'
+import type { AxiosError } from 'axios'
 
 // Dynamically imported — avoids SSR issues with camera APIs
 const BarcodeScanner = dynamic(() => import('@/components/BarcodeScanner'), { ssr: false })
@@ -39,7 +40,7 @@ const DRAFT_KEY = 'dukaanos_product_draft'
 const STEP_KEY  = 'dukaanos_product_step'
 
 // ─── Typing animation ─────────────────────────────────────────────────────────
-function TypedText({ text, onDone }) {
+function TypedText({ text, onDone }: { text: string; onDone?: () => void }) {
   const [shown, setShown] = useState('')
   useEffect(() => {
     setShown('')
@@ -49,12 +50,12 @@ function TypedText({ text, onDone }) {
       if (i >= text.length) { clearInterval(t); onDone?.() }
     }, 18)
     return () => clearInterval(t)
-  }, [text])
+  }, [text, onDone])
   return <>{shown}{shown.length < text.length && <span className="text-orange-400 animate-pulse">|</span>}</>
 }
 
 // ─── Progress bar ─────────────────────────────────────────────────────────────
-function Progress({ step, total }) {
+function Progress({ step, total }: { step: number; total: number }) {
   const pct = Math.round((step / (total - 1)) * 100)
   const labels = ['Almost starting...', 'Going well!', 'Halfway there!', 'More than half!', 'Almost done!', 'Last step!', 'Ready!']
   return (
@@ -72,7 +73,7 @@ function Progress({ step, total }) {
 
 export default function NewProductPage() {
   const router = useRouter()
-  const inputRef = useRef(null)
+  const inputRef = useRef<HTMLInputElement | null>(null)
   const [step, setStep] = useState(0)
   const [typingDone, setTypingDone] = useState(false)
   const [showScanner, setShowScanner] = useState(false)
@@ -110,12 +111,12 @@ export default function NewProductPage() {
     if (typingDone) setTimeout(() => inputRef.current?.focus(), 80)
   }, [typingDone, step])
 
-  function update(k, v) { setForm(f => ({ ...f, [k]: v })) }
+  function update(k: string, v: string) { setForm(f => ({ ...f, [k]: v })) }
 
-  function goTo(n) { setTypingDone(false); setStep(n) }
+  function goTo(n: number) { setTypingDone(false); setStep(n) }
 
   // ── Barcode scan result ──
-  async function handleBarcode(code) {
+  async function handleBarcode(code: string) {
     setShowScanner(false)
     update('barcode', code)
     setBarcodeLoading(true)
@@ -165,8 +166,9 @@ export default function NewProductPage() {
       localStorage.removeItem(STEP_KEY)
       toast.success('Product add हो गया! 🎉')
       router.replace('/products')
-    } catch (err) {
-      toast.error(err.response?.data?.error || 'Submit नहीं हुआ')
+    } catch (err: unknown) {
+      const axErr = err as AxiosError<{ error?: string }>
+      toast.error(axErr.response?.data?.error || 'Submit नहीं हुआ')
     } finally {
       setSubmitting(false)
     }
@@ -468,7 +470,7 @@ export default function NewProductPage() {
   )
 }
 
-function NextBtn({ onClick, disabled, label = 'आगे बढ़ें →' }) {
+function NextBtn({ onClick, disabled, label = 'आगे बढ़ें →' }: { onClick: () => void; disabled?: boolean; label?: string }) {
   return (
     <motion.button
       whileTap={{ scale: 0.97 }}

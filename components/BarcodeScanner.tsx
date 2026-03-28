@@ -1,14 +1,19 @@
 'use client'
 
-import { useEffect, useRef } from 'react'
+import { useEffect } from 'react'
 import { useZxing } from 'react-zxing'
 import { motion } from 'framer-motion'
+
+interface BarcodeScannerProps {
+  onDetect: (code: string) => void
+  onClose: () => void
+}
 
 /**
  * Full-screen camera barcode scanner overlay.
  * Calls onDetect(code) when a barcode is read, onClose to dismiss.
  */
-export default function BarcodeScanner({ onDetect, onClose }) {
+export default function BarcodeScanner({ onDetect, onClose }: BarcodeScannerProps) {
   const { ref } = useZxing({
     onDecodeResult(result) {
       onDetect(result.getText())

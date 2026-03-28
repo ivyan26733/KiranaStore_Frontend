@@ -7,8 +7,9 @@ import toast from 'react-hot-toast'
 import AppHeader from '@/components/AppHeader'
 import EmptyState from '@/components/EmptyState'
 import { getProducts, createBill } from '@/lib/api'
-import { useCartStore } from '@/lib/store'
+import { useCartStore, type Product } from '@/lib/store'
 import Link from 'next/link'
+import type { AxiosError } from 'axios'
 
 const PAY_MODES = [
   { value: 'CASH',    emoji: '💵', label: 'Cash',   hi: 'नकद'  },
@@ -19,7 +20,7 @@ const PAY_MODES = [
 export default function BillingPage() {
   const router = useRouter()
   const { items, addItem, removeItem, updateQuantity, clearCart } = useCartStore()
-  const [products, setProducts] = useState([])
+  const [products, setProducts] = useState<Product[]>([])
   const [search, setSearch] = useState('')
   const [payMode, setPayMode] = useState('CASH')
   const [discount, setDiscount] = useState('')
@@ -35,7 +36,7 @@ export default function BillingPage() {
   const filtered = useMemo(() => {
     const q = search.toLowerCase()
     if (!q) return products.slice(0, 30)
-    return products.filter(p =>
+    return products.filter((p: Product) =>
       p.name.toLowerCase().includes(q) || (p.barcode || '').includes(q)
     )
   }, [products, search])
@@ -45,7 +46,7 @@ export default function BillingPage() {
   const total = Math.max(0, subtotal - discountAmt)
   const cartCount = items.reduce((s, i) => s + i.quantity, 0)
 
-  function addToCart(p) {
+  function addToCart(p: Product) {
     if (p.current_stock === 0) { toast.error(`${p.name} — stock नहीं है`); return }
     addItem(p)
   }
@@ -62,14 +63,15 @@ export default function BillingPage() {
       clearCart()
       toast.success('🎉 Bill बन गया!')
       router.push('/billing/history')
-    } catch (err) {
-      toast.error(err.response?.data?.error || 'Bill नहीं बना, retry करें')
+    } catch (err: unknown) {
+      const axErr = err as AxiosError<{ error?: string }>
+      toast.error(axErr.response?.data?.error || 'Bill नहीं बना, retry करें')
     } finally {
       setSubmitting(false)
     }
   }
 
-  const cartItem = (pid) => items.find(i => i.product.id === pid)
+  const cartItem = (pid: string) => items.find(i => i.product.id === pid)
 
   return (
     <div className="max-w-[480px] mx-auto flex flex-col min-h-screen">
@@ -120,7 +122,7 @@ export default function BillingPage() {
               ? <EmptyState emoji="🔍" title="No results" subtitle="Try a different search" />
               : (
                 <div className="flex flex-col gap-2">
-                  {filtered.map(p => {
+                  {filtered.map((p: Product) => {
                     const ci = cartItem(p.id)
                     const outOfStock = p.current_stock === 0
                     return (

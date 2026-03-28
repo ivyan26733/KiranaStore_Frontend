@@ -9,13 +9,30 @@ import EmptyState from '@/components/EmptyState'
 import Spinner from '@/components/Spinner'
 import { getBills } from '@/lib/api'
 
-const MODE = {
+interface BillItem {
+  id: string
+  product_name: string
+  quantity: number
+  total_price: number | string
+}
+
+interface Bill {
+  id: string
+  bill_number: number
+  total: number | string
+  discount: number | string
+  payment_mode: string
+  created_at: string
+  items?: BillItem[]
+}
+
+const MODE: Record<string, { label: string; color: string }> = {
   CASH:    { label: 'Cash',   color: 'bg-green-100 text-green-700'  },
   UPI:     { label: 'UPI',    color: 'bg-blue-100  text-blue-700'   },
   UDHAARI: { label: 'उधार',  color: 'bg-amber-100 text-amber-700'  },
 }
 
-function BillCard({ bill, index }) {
+function BillCard({ bill, index }: { bill: Bill; index: number }) {
   const [open, setOpen] = useState(false)
   const m = MODE[bill.payment_mode] || MODE.CASH
   const d = new Date(bill.created_at)
@@ -81,7 +98,7 @@ function BillCard({ bill, index }) {
 }
 
 export default function BillingHistoryPage() {
-  const [bills, setBills] = useState([])
+  const [bills, setBills] = useState<Bill[]>([])
   const [loading, setLoading] = useState(true)
   const [page, setPage] = useState(1)
   const [total, setTotal] = useState(0)
@@ -89,11 +106,15 @@ export default function BillingHistoryPage() {
 
   useEffect(() => { load(1) }, [])
 
-  async function load(p) {
+  async function load(p: number) {
     p === 1 ? setLoading(true) : setLoadingMore(true)
     try {
       const res = await getBills({ page: p, limit: 20 })
-      setBills(p === 1 ? res.data.bills : prev => [...prev, ...res.data.bills])
+      if (p === 1) {
+        setBills(res.data.bills)
+      } else {
+        setBills(prev => [...prev, ...res.data.bills])
+      }
       setTotal(res.data.total)
       setPage(p)
     } catch { toast.error('Bills load नहीं हुए') }
@@ -101,8 +122,8 @@ export default function BillingHistoryPage() {
   }
 
   const todayRevenue = bills
-    .filter(b => new Date(b.created_at).toDateString() === new Date().toDateString())
-    .reduce((s, b) => s + Number(b.total), 0)
+    .filter((b: Bill) => new Date(b.created_at).toDateString() === new Date().toDateString())
+    .reduce((s: number, b: Bill) => s + Number(b.total), 0)
 
   return (
     <div className="max-w-[480px] mx-auto">
@@ -140,7 +161,7 @@ export default function BillingHistoryPage() {
           : (
             <>
               <div className="flex flex-col gap-2.5">
-                {bills.map((b, i) => <BillCard key={b.id} bill={b} index={i} />)}
+                {bills.map((b: Bill, i: number) => <BillCard key={b.id} bill={b} index={i} />)}
               </div>
 
               {bills.length < total && (
