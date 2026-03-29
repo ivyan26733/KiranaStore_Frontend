@@ -67,7 +67,7 @@ export default function CustomerStorefront({ params }: { params: Promise<{ qrCod
     params.then(p => setQrCode(p.qrCode))
   }, [params])
 
-  // Fetch shop + products
+  // Fetch shop + products — normalize Prisma Decimal → plain JS number at the boundary
   useEffect(() => {
     if (!qrCode) return
     fetch(`/api/public/shop/${qrCode}`)
@@ -75,7 +75,16 @@ export default function CustomerStorefront({ params }: { params: Promise<{ qrCod
         if (!r.ok) { setNotFound(true); return }
         const data = await r.json()
         setShop(data.shop)
-        setProducts(data.products)
+        // Prisma serializes Decimal as string. Coerce to number here so all
+        // downstream arithmetic is unambiguous and the objects are plain copies.
+        setProducts(
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          (data.products as any[]).map(p => ({
+            ...p,
+            selling_price: Number(p.selling_price),
+            mrp: Number(p.mrp),
+          }))
+        )
       })
       .catch(() => setNotFound(true))
       .finally(() => setLoading(false))
@@ -89,8 +98,14 @@ export default function CustomerStorefront({ params }: { params: Promise<{ qrCod
   function addToCart(product: PublicProduct) {
     setCart(prev => {
       const existing = prev.find(i => i.product.id === product.id)
-      if (existing) return prev.map(i => i.product.id === product.id ? { ...i, quantity: i.quantity + 1 } : i)
-      return [...prev, { product, quantity: 1 }]
+      if (existing) {
+        return prev.map(i =>
+          i.product.id === product.id ? { ...i, quantity: i.quantity + 1 } : i
+        )
+      }
+      // Spread a fresh copy so the cart item never shares a reference with
+      // the products[] array. Prevents cross-contamination on re-renders.
+      return [...prev, { product: { ...product }, quantity: 1 }]
     })
   }
 
@@ -132,6 +147,11 @@ export default function CustomerStorefront({ params }: { params: Promise<{ qrCod
       })
       const data = await res.json()
       if (!res.ok) { toast.error(data.error || 'Order नहीं हुआ'); return }
+      // Clear cart and form BEFORE switching to confirm so the browse step
+      // never renders with stale cart prices if AnimatePresence triggers it.
+      setCart([])
+      setCustomerName('')
+      setCustomerPhone('')
       setOrderResult({
         bill_number: data.bill.bill_number,
         total: Number(data.bill.total),
@@ -241,7 +261,7 @@ export default function CustomerStorefront({ params }: { params: Promise<{ qrCod
 
           <motion.button
             whileTap={{ scale: 0.97 }}
-            onClick={() => { setCart([]); setStep('browse'); setOrderResult(null) }}
+            onClick={() => { setOrderResult(null); setStep('browse') }}
             className="w-full mt-4 py-3 border-2 border-orange-200 text-orange-500 font-bold text-sm rounded-2xl"
           >
             नई Shopping करें

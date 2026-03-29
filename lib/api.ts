@@ -41,4 +41,10 @@ export const getBills = (params?: Record<string, unknown>) => api.get('/bills', 
 export const getBill = (id: string) => api.get(`/bills/${id}`)
 export const getDailySummary = () => api.get('/bills/summary/daily')
 
+// ─── Vendor Deals (shopkeeper browsing) ──────────────────────────────────────
+export const getAvailableDeals = (params?: { category?: string }) =>
+  api.get('/procurement/deals', { params })
+export const expressInterest = (dealId: string, notes?: string) =>
+  api.post(`/procurement/deals/${dealId}/interest`, { notes })
+
 export default api
